@@ -182,7 +182,7 @@ class _RegisterState extends State<Register> {
                               padding: const EdgeInsets.all(8.0),
                               child: GestureDetector(
                                 onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
+                                  Navigator.of(context).pushReplacement(MaterialPageRoute(
                                       builder: (context) => LoginPage()));
                                 },
                                 child: const Text("Login",

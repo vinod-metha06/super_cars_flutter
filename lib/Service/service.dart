@@ -1,5 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -73,7 +73,7 @@ class Service {
       'price': price,
       'id': v
     }, SetOptions(merge: true)).whenComplete(() => ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text("Added..."))));
+        .showSnackBar(const SnackBar(content: Text("Added to wishlist..."))));
   }
 
   Future<void> deleteWish(String id, BuildContext context) async {
@@ -84,13 +84,76 @@ class Service {
         );
   }
 
+  Future<void> addToCart(String name, String image, String price, String id,
+      BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var email = prefs.getString("email");
+    String v = email! + id;
+    await db.collection("cart").doc(v).set({
+      'email': email.toString().trim(),
+      'name': name,
+      'image': image,
+      'price': price,
+      'id': v
+    }, SetOptions(merge: true)).whenComplete(() => ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text("Added to cart..."))));
+  }
+
+  Future<void> deleteCart(String id, BuildContext context) async {
+    db.collection("cart").doc(id).delete().then(
+          (doc) => ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Deleted..."),
+            ),
+          ),
+          onError: (e) => print("Error updating document $e"),
+        );
+  }
+
+  Stream<QuerySnapshot> allCarStream =
+      FirebaseFirestore.instance.collection('cars').snapshots();
+
+  Stream<QuerySnapshot> allCarStream1 =
+      FirebaseFirestore.instance.collection('cars').snapshots();
+  Stream<QuerySnapshot> allCarStream2 =
+      FirebaseFirestore.instance.collection('cars').snapshots();
+  Stream<QuerySnapshot> allCarStream3 =
+      FirebaseFirestore.instance.collection('cars').snapshots();
+  Stream<QuerySnapshot> allCarStream4 =
+      FirebaseFirestore.instance.collection('cars').snapshots();
+
   Stream<QuerySnapshot> luxuryCarStream = FirebaseFirestore.instance
       .collection('cars')
       .where("type", isEqualTo: "Luxury")
       .snapshots();
 
+  Stream<QuerySnapshot> suvCarStream = FirebaseFirestore.instance
+      .collection('cars')
+      .where("type", isEqualTo: "suv")
+      .snapshots();
+
+  Stream<QuerySnapshot> sportsCarStream = FirebaseFirestore.instance
+      .collection('cars')
+      .where("type", isEqualTo: "sports")
+      .snapshots();
+
+  Stream<QuerySnapshot> economyCarStream = FirebaseFirestore.instance
+      .collection('cars')
+      .where("type", isEqualTo: "economy")
+      .snapshots();
+
   Stream<QuerySnapshot> wishlistCarStream = FirebaseFirestore.instance
       .collection('wishlist')
+      .where("email", isEqualTo: FirebaseAuth.instance.currentUser?.email)
+      .snapshots();
+
+  Stream<QuerySnapshot> CartCarStream = FirebaseFirestore.instance
+      .collection('cart')
+      .where("email", isEqualTo: FirebaseAuth.instance.currentUser?.email)
+      .snapshots();
+
+  Stream<QuerySnapshot> userStream = FirebaseFirestore.instance
+      .collection('users')
       .where("email", isEqualTo: FirebaseAuth.instance.currentUser?.email)
       .snapshots();
 }

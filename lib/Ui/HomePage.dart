@@ -148,136 +148,531 @@ class _HomePageState extends State<HomePage>
           ),
           Expanded(
             child: TabBarView(controller: _tabController, children: [
-              ListView(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                children: [
-                  Container(
-                    color: Colors.blue,
-                    height: 200,
-                    child: Text("hj"),
-                  ),
-                  Container(
-                    color: Colors.blue,
-                    height: 700,
-                    child: Text("hj"),
-                  )
-                ],
-              ),
               ListView(children: [
                 SizedBox(
                   height: 300,
-                  child: CarouselSlider.builder(
-                    options: CarouselOptions(
-                      height: 280,
-                      pageSnapping: true,
-                      aspectRatio: 16 / 9,
-                      viewportFraction: 0.7,
-                      initialPage: 0,
-                      enableInfiniteScroll: false,
-                      reverse: false,
-                      autoPlay: false,
-                      autoPlayInterval: const Duration(seconds: 3),
-                      autoPlayAnimationDuration:
-                          const Duration(milliseconds: 800),
-                      autoPlayCurve: Curves.fastOutSlowIn,
-                      enlargeCenterPage: true,
-                      enlargeFactor: 0.3,
-                      scrollDirection: Axis.horizontal,
-                      onPageChanged: (index, C) {
-                        setState(() {
-                          _current = index;
-                          print(_current);
-                        });
-                      },
-                    ),
-                    itemCount: 5,
-                    itemBuilder: (context, index, realIndex) {
-                      return Container(
-                        width: MediaQuery.of(context).size.width,
-                        padding: const EdgeInsets.all(12.0),
-                        margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(40),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.amber,
-                                        borderRadius:
-                                            BorderRadius.circular(40)),
-                                    child: const Icon(Icons.add))
-                              ],
-                            ),
-                            // Container(
-                            //   height: 160,
-                            //   width: 200,
-                            //   decoration: BoxDecoration(
-                            //     color: Colors.amber,
-                            //     borderRadius: BorderRadius.circular(40),
-                            //   ),
-                            // ),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Image.network(
-                                'https://www.seekpng.com/png/full/250-2500018_car-white-background-pics-car-image-png-hd.png',
-                                height: 150.0,
-                                width: 100.0,
+                  child: StreamBuilder<QuerySnapshot>(
+                      stream: _service.allCarStream,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return const Text('Something went wrong');
+                        }
+
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Text("Loading");
+                        }
+                        return CarouselSlider.builder(
+                          options: CarouselOptions(
+                            height: 280,
+                            pageSnapping: true,
+                            aspectRatio: 16 / 9,
+                            viewportFraction: 0.7,
+                            initialPage: 0,
+                            enableInfiniteScroll: false,
+                            reverse: false,
+                            autoPlay: false,
+                            autoPlayInterval: const Duration(seconds: 3),
+                            autoPlayAnimationDuration:
+                                const Duration(milliseconds: 800),
+                            autoPlayCurve: Curves.fastOutSlowIn,
+                            enlargeCenterPage: true,
+                            enlargeFactor: 0.3,
+                            scrollDirection: Axis.horizontal,
+                            onPageChanged: (index, C) {
+                              setState(() {
+                                _current = index;
+                                print(_current);
+                              });
+                            },
+                          ),
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index, realIndex) {
+                            var data = snapshot.data!.docs;
+                            return Container(
+                              width: MediaQuery.of(context).size.width,
+                              padding: const EdgeInsets.all(12.0),
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 5.0),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(40),
                               ),
-                            ),
-                            const Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text("BWM"),
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                    // items: [1, 2, 3, 4, 5].map((i) {
-                    //   return Builder(
-                    //     builder: (BuildContext context) {
-                    //       return Container(
-                    //         width: MediaQuery.of(context).size.width,
-                    //         padding: const EdgeInsets.all(12.0),
-                    //         margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                    //         decoration: BoxDecoration(
-                    //           color: Colors.grey[200],
-                    //           borderRadius: BorderRadius.circular(40),
-                    //         ),
-                    //         child: Column(
-                    //           children: [
-                    //             Row(
-                    //               mainAxisAlignment: MainAxisAlignment.end,
-                    //               children: [
-                    //                 Container(
-                    //                     decoration: BoxDecoration(
-                    //                         color: Colors.amber,
-                    //                         borderRadius:
-                    //                             BorderRadius.circular(40)),
-                    //                     child: const Icon(Icons.add))
-                    //               ],
-                    //             ),
-                    //             Container(
-                    //               height: 180,
-                    //               width: 200,
-                    //               decoration: BoxDecoration(
-                    //                 color: Colors.amber,
-                    //                 borderRadius: BorderRadius.circular(40),
-                    //               ),
-                    //             ),
-                    //             Text("BWM")
-                    //           ],
-                    //         ),
-                    //       );
-                    //     },
-                    //   );
-                    // }).toList(),
-                  ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.amber,
+                                              borderRadius:
+                                                  BorderRadius.circular(40)),
+                                          child: const Icon(Icons.add))
+                                    ],
+                                  ),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(
+                                      data[index]["image"],
+                                      height: 160.0,
+                                      width: 140.0,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(data[index]["name"]
+                                                .toString()
+                                                .length >
+                                            10
+                                        ? data[index]["name"]
+                                            .toString()
+                                            .substring(0, 10)
+                                        : data[index]["name"].toString()),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }),
+                ),
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Text(
+                            "Top",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          Icon(Icons.more_horiz)
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 160,
+                      child: StreamBuilder<QuerySnapshot>(
+                          stream: _service.allCarStream,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return const Text('Something went wrong');
+                            }
+
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Text("Loading");
+                            }
+                            var data = snapshot.data!.docs;
+                            return ListView.separated(
+                                separatorBuilder: (context, index) =>
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                scrollDirection: Axis.horizontal,
+                                shrinkWrap: true,
+                                itemCount: snapshot.data!.docs.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DetailsPage(
+                                          data: data[index],
+                                        ),
+                                      ),
+                                    ),
+                                    child: Container(
+                                      height: 120,
+                                      width: 200,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(40),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            child: Image.network(
+                                              data[index]["image"].toString(),
+                                              height: 100.0,
+                                              width: 100.0,
+                                              fit: BoxFit.contain,
+                                              loadingBuilder:
+                                                  (BuildContext context,
+                                                      Widget child,
+                                                      ImageChunkEvent?
+                                                          loadingProgress) {
+                                                if (loadingProgress == null) {
+                                                  return child;
+                                                }
+                                                return Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    value: loadingProgress
+                                                                .expectedTotalBytes !=
+                                                            null
+                                                        ? loadingProgress
+                                                                .cumulativeBytesLoaded /
+                                                            loadingProgress
+                                                                .expectedTotalBytes!
+                                                        : null,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(data[index]["name"]
+                                                          .toString()
+                                                          .length >
+                                                      10
+                                                  ? data[index]["name"]
+                                                      .toString()
+                                                      .substring(0, 10)
+                                                  : data[index]["name"]
+                                                      .toString()),
+                                              Text("\$" +
+                                                  data[index]["price"]
+                                                      .toString())
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                });
+                          }),
+                    )
+                  ],
+                )
+              ]),
+
+              //Economy
+              ListView(children: [
+                SizedBox(
+                  height: 300,
+                  child: StreamBuilder<QuerySnapshot>(
+                      stream: _service.allCarStream1,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return const Text('Something went wrong');
+                        }
+
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Text("Loading");
+                        }
+                        return CarouselSlider.builder(
+                          options: CarouselOptions(
+                            height: 280,
+                            pageSnapping: true,
+                            aspectRatio: 16 / 9,
+                            viewportFraction: 0.7,
+                            initialPage: 0,
+                            enableInfiniteScroll: false,
+                            reverse: false,
+                            autoPlay: false,
+                            autoPlayInterval: const Duration(seconds: 3),
+                            autoPlayAnimationDuration:
+                                const Duration(milliseconds: 800),
+                            autoPlayCurve: Curves.fastOutSlowIn,
+                            enlargeCenterPage: true,
+                            enlargeFactor: 0.3,
+                            scrollDirection: Axis.horizontal,
+                            onPageChanged: (index, C) {
+                              setState(() {
+                                _current = index;
+                                print(_current);
+                              });
+                            },
+                          ),
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index, realIndex) {
+                            var data = snapshot.data!.docs;
+                            return Container(
+                              width: MediaQuery.of(context).size.width,
+                              padding: const EdgeInsets.all(12.0),
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 5.0),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(40),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.amber,
+                                              borderRadius:
+                                                  BorderRadius.circular(40)),
+                                          child: const Icon(Icons.add))
+                                    ],
+                                  ),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(
+                                      data[index]["image"],
+                                      height: 160.0,
+                                      width: 140.0,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(data[index]["name"]
+                                                .toString()
+                                                .length >
+                                            10
+                                        ? data[index]["name"]
+                                            .toString()
+                                            .substring(0, 10)
+                                        : data[index]["name"].toString()),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }),
+                ),
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Text(
+                            "Top",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          Icon(Icons.more_horiz)
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 160,
+                      child: StreamBuilder<QuerySnapshot>(
+                          stream: _service.economyCarStream,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return const Text('Something went wrong');
+                            }
+
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Text("Loading");
+                            }
+                            var data = snapshot.data!.docs;
+                            return ListView.separated(
+                                separatorBuilder: (context, index) =>
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                scrollDirection: Axis.horizontal,
+                                shrinkWrap: true,
+                                itemCount: snapshot.data!.docs.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DetailsPage(
+                                          data: data[index],
+                                        ),
+                                      ),
+                                    ),
+                                    child: Container(
+                                      height: 120,
+                                      width: 200,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(40),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          // Container(
+                                          //   height: 100,
+                                          //   width: 100,
+                                          //   decoration: BoxDecoration(
+                                          //     color: Colors.blue,
+                                          //     borderRadius: BorderRadius.circular(20),
+                                          //   ),
+                                          // ),
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            child: Image.network(
+                                              data[index]["image"].toString(),
+                                              height: 100.0,
+                                              width: 100.0,
+                                              fit: BoxFit.contain,
+                                              loadingBuilder:
+                                                  (BuildContext context,
+                                                      Widget child,
+                                                      ImageChunkEvent?
+                                                          loadingProgress) {
+                                                if (loadingProgress == null) {
+                                                  return child;
+                                                }
+                                                return Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    value: loadingProgress
+                                                                .expectedTotalBytes !=
+                                                            null
+                                                        ? loadingProgress
+                                                                .cumulativeBytesLoaded /
+                                                            loadingProgress
+                                                                .expectedTotalBytes!
+                                                        : null,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(data[index]["name"]
+                                                          .toString()
+                                                          .length >
+                                                      10
+                                                  ? data[index]["name"]
+                                                      .toString()
+                                                      .substring(0, 10)
+                                                  : data[index]["name"]
+                                                      .toString()),
+                                              Text("\$" +
+                                                  data[index]["price"]
+                                                      .toString())
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                });
+                          }),
+                    )
+                  ],
+                )
+              ]),
+
+              // Luxury
+
+              ListView(children: [
+                SizedBox(
+                  height: 300,
+                  child: StreamBuilder<QuerySnapshot>(
+                      stream: _service.allCarStream2,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return const Text('Something went wrong');
+                        }
+
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Text("Loading");
+                        }
+                        return CarouselSlider.builder(
+                          options: CarouselOptions(
+                            height: 280,
+                            pageSnapping: true,
+                            aspectRatio: 16 / 9,
+                            viewportFraction: 0.7,
+                            initialPage: 0,
+                            enableInfiniteScroll: false,
+                            reverse: false,
+                            autoPlay: false,
+                            autoPlayInterval: const Duration(seconds: 3),
+                            autoPlayAnimationDuration:
+                                const Duration(milliseconds: 800),
+                            autoPlayCurve: Curves.fastOutSlowIn,
+                            enlargeCenterPage: true,
+                            enlargeFactor: 0.3,
+                            scrollDirection: Axis.horizontal,
+                            onPageChanged: (index, C) {
+                              setState(() {
+                                _current = index;
+                                print(_current);
+                              });
+                            },
+                          ),
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index, realIndex) {
+                            var data = snapshot.data!.docs;
+                            return Container(
+                              width: MediaQuery.of(context).size.width,
+                              padding: const EdgeInsets.all(12.0),
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 5.0),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(40),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.amber,
+                                              borderRadius:
+                                                  BorderRadius.circular(40)),
+                                          child: const Icon(Icons.add))
+                                    ],
+                                  ),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(
+                                      data[index]["image"],
+                                      height: 160.0,
+                                      width: 140.0,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(data[index]["name"]
+                                                .toString()
+                                                .length >
+                                            10
+                                        ? data[index]["name"]
+                                            .toString()
+                                            .substring(0, 10)
+                                        : data[index]["name"].toString()),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }),
                 ),
                 Column(
                   children: [
@@ -350,11 +745,34 @@ class _HomePageState extends State<HomePage>
                                           // ),
                                           ClipRRect(
                                             borderRadius:
-                                                BorderRadius.circular(8.0),
+                                                BorderRadius.circular(20.0),
                                             child: Image.network(
                                               data[index]["image"].toString(),
-                                              height: 150.0,
+                                              height: 100.0,
                                               width: 100.0,
+                                              fit: BoxFit.contain,
+                                              loadingBuilder:
+                                                  (BuildContext context,
+                                                      Widget child,
+                                                      ImageChunkEvent?
+                                                          loadingProgress) {
+                                                if (loadingProgress == null) {
+                                                  return child;
+                                                }
+                                                return Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    value: loadingProgress
+                                                                .expectedTotalBytes !=
+                                                            null
+                                                        ? loadingProgress
+                                                                .cumulativeBytesLoaded /
+                                                            loadingProgress
+                                                                .expectedTotalBytes!
+                                                        : null,
+                                                  ),
+                                                );
+                                              },
                                             ),
                                           ),
                                           Column(
@@ -363,7 +781,15 @@ class _HomePageState extends State<HomePage>
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(data[index]["name"]),
+                                              Text(data[index]["name"]
+                                                          .toString()
+                                                          .length >
+                                                      10
+                                                  ? data[index]["name"]
+                                                      .toString()
+                                                      .substring(0, 10)
+                                                  : data[index]["name"]
+                                                      .toString()),
                                               Text("\$" +
                                                   data[index]["price"]
                                                       .toString())
@@ -378,8 +804,454 @@ class _HomePageState extends State<HomePage>
                     )
                   ],
                 )
-              ])
+              ]),
+
+              //SUV
+              ListView(children: [
+                SizedBox(
+                  height: 300,
+                  child: StreamBuilder<QuerySnapshot>(
+                      stream: _service.allCarStream3,
+                      builder: (context, snapshot) {
+                        return CarouselSlider.builder(
+                          options: CarouselOptions(
+                            height: 280,
+                            pageSnapping: true,
+                            aspectRatio: 16 / 9,
+                            viewportFraction: 0.7,
+                            initialPage: 0,
+                            enableInfiniteScroll: false,
+                            reverse: false,
+                            autoPlay: false,
+                            autoPlayInterval: const Duration(seconds: 3),
+                            autoPlayAnimationDuration:
+                                const Duration(milliseconds: 800),
+                            autoPlayCurve: Curves.fastOutSlowIn,
+                            enlargeCenterPage: true,
+                            enlargeFactor: 0.3,
+                            scrollDirection: Axis.horizontal,
+                            onPageChanged: (index, C) {
+                              setState(() {
+                                _current = index;
+                                print(_current);
+                              });
+                            },
+                          ),
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index, realIndex) {
+                            var data = snapshot.data!.docs;
+                            if (snapshot.hasError) {
+                              return const Text('Something went wrong');
+                            }
+
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Text("Loading");
+                            }
+                            return Container(
+                              width: MediaQuery.of(context).size.width,
+                              padding: const EdgeInsets.all(12.0),
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 5.0),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(40),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.amber,
+                                              borderRadius:
+                                                  BorderRadius.circular(40)),
+                                          child: const Icon(Icons.add))
+                                    ],
+                                  ),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(
+                                      data[index]["image"],
+                                      height: 160.0,
+                                      width: 140.0,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(data[index]["name"]
+                                                .toString()
+                                                .length >
+                                            10
+                                        ? data[index]["name"]
+                                            .toString()
+                                            .substring(0, 10)
+                                        : data[index]["name"].toString()),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }),
+                ),
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Text(
+                            "Top",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          Icon(Icons.more_horiz)
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 160,
+                      child: StreamBuilder<QuerySnapshot>(
+                          stream: _service.suvCarStream,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return const Text('Something went wrong');
+                            }
+
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Text("Loading");
+                            }
+                            var data = snapshot.data!.docs;
+                            return ListView.separated(
+                                separatorBuilder: (context, index) =>
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                scrollDirection: Axis.horizontal,
+                                shrinkWrap: true,
+                                itemCount: snapshot.data!.docs.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DetailsPage(
+                                          data: data[index],
+                                        ),
+                                      ),
+                                    ),
+                                    child: Container(
+                                      height: 120,
+                                      width: 200,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(40),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          // Container(
+                                          //   height: 100,
+                                          //   width: 100,
+                                          //   decoration: BoxDecoration(
+                                          //     color: Colors.blue,
+                                          //     borderRadius: BorderRadius.circular(20),
+                                          //   ),
+                                          // ),
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            child: Image.network(
+                                              data[index]["image"].toString(),
+                                              height: 100.0,
+                                              width: 100.0,
+                                              fit: BoxFit.contain,
+                                              loadingBuilder:
+                                                  (BuildContext context,
+                                                      Widget child,
+                                                      ImageChunkEvent?
+                                                          loadingProgress) {
+                                                if (loadingProgress == null) {
+                                                  return child;
+                                                }
+                                                return Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    value: loadingProgress
+                                                                .expectedTotalBytes !=
+                                                            null
+                                                        ? loadingProgress
+                                                                .cumulativeBytesLoaded /
+                                                            loadingProgress
+                                                                .expectedTotalBytes!
+                                                        : null,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(data[index]["name"]
+                                                          .toString()
+                                                          .length >
+                                                      10
+                                                  ? data[index]["name"]
+                                                      .toString()
+                                                      .substring(0, 10)
+                                                  : data[index]["name"]
+                                                      .toString()),
+                                              Text("\$" +
+                                                  data[index]["price"]
+                                                      .toString())
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                });
+                          }),
+                    )
+                  ],
+                )
+              ]),
+
+              //Sports
+              ListView(children: [
+                SizedBox(
+                  height: 300,
+                  child: StreamBuilder<QuerySnapshot>(
+                      stream: _service.allCarStream4,
+                      builder: (context, snapshot) {
+                        return CarouselSlider.builder(
+                          options: CarouselOptions(
+                            height: 280,
+                            pageSnapping: true,
+                            aspectRatio: 16 / 9,
+                            viewportFraction: 0.7,
+                            initialPage: 0,
+                            enableInfiniteScroll: false,
+                            reverse: false,
+                            autoPlay: false,
+                            autoPlayInterval: const Duration(seconds: 3),
+                            autoPlayAnimationDuration:
+                                const Duration(milliseconds: 800),
+                            autoPlayCurve: Curves.fastOutSlowIn,
+                            enlargeCenterPage: true,
+                            enlargeFactor: 0.3,
+                            scrollDirection: Axis.horizontal,
+                            onPageChanged: (index, C) {
+                              setState(() {
+                                _current = index;
+                                print(_current);
+                              });
+                            },
+                          ),
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index, realIndex) {
+                            var data = snapshot.data!.docs;
+                            if (snapshot.hasError) {
+                              return const Text('Something went wrong');
+                            }
+
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Text("Loading");
+                            }
+                            return Container(
+                              width: MediaQuery.of(context).size.width,
+                              padding: const EdgeInsets.all(12.0),
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 5.0),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(40),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.amber,
+                                              borderRadius:
+                                                  BorderRadius.circular(40)),
+                                          child: const Icon(Icons.add))
+                                    ],
+                                  ),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(
+                                      data[index]["image"],
+                                      height: 160.0,
+                                      width: 140.0,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(data[index]["name"]
+                                                .toString()
+                                                .length >
+                                            10
+                                        ? data[index]["name"]
+                                            .toString()
+                                            .substring(0, 10)
+                                        : data[index]["name"].toString()),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      }),
+                ),
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Text(
+                            "Top",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          Icon(Icons.more_horiz)
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 160,
+                      child: StreamBuilder<QuerySnapshot>(
+                          stream: _service.sportsCarStream,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return const Text('Something went wrong');
+                            }
+
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Text("Loading");
+                            }
+                            var data = snapshot.data!.docs;
+                            return ListView.separated(
+                                separatorBuilder: (context, index) =>
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                scrollDirection: Axis.horizontal,
+                                shrinkWrap: true,
+                                itemCount: snapshot.data!.docs.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DetailsPage(
+                                          data: data[index],
+                                        ),
+                                      ),
+                                    ),
+                                    child: Container(
+                                      height: 120,
+                                      width: 200,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(40),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          // Container(
+                                          //   height: 100,
+                                          //   width: 100,
+                                          //   decoration: BoxDecoration(
+                                          //     color: Colors.blue,
+                                          //     borderRadius: BorderRadius.circular(20),
+                                          //   ),
+                                          // ),
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            child: Image.network(
+                                              data[index]["image"].toString(),
+                                              height: 100.0,
+                                              width: 100.0,
+                                              fit: BoxFit.contain,
+                                              loadingBuilder:
+                                                  (BuildContext context,
+                                                      Widget child,
+                                                      ImageChunkEvent?
+                                                          loadingProgress) {
+                                                if (loadingProgress == null) {
+                                                  return child;
+                                                }
+                                                return Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    value: loadingProgress
+                                                                .expectedTotalBytes !=
+                                                            null
+                                                        ? loadingProgress
+                                                                .cumulativeBytesLoaded /
+                                                            loadingProgress
+                                                                .expectedTotalBytes!
+                                                        : null,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(data[index]["name"]
+                                                          .toString()
+                                                          .length >
+                                                      10
+                                                  ? data[index]["name"]
+                                                      .toString()
+                                                      .substring(0, 10)
+                                                  : data[index]["name"]
+                                                      .toString()),
+                                              Text("\$" +
+                                                  data[index]["price"]
+                                                      .toString())
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                });
+                          }),
+                    )
+                  ],
+                )
+              ]),
             ]),
+
+//Luxury
           ),
         ],
       ),

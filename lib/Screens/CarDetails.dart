@@ -164,25 +164,32 @@ class _DetailsPageState extends State<DetailsPage> {
               ),
             ),
           ),
-          Container(
-            color: Colors.white10,
-            height: MediaQuery.of(context).size.height * 0.08,
-            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              Container(
-                height: 80,
-                padding: EdgeInsets.all(12),
-                width: MediaQuery.of(context).size.width * 0.5,
-                decoration: const BoxDecoration(
-                  color: Colors.amber,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(80)),
+          GestureDetector(
+            onTap: () async {
+              _service.addToCart(widget.data["name"], widget.data["image"],
+                  widget.data["price"].toString(), widget.data["id"], context);
+            },
+            child: Container(
+              color: Colors.white10,
+              height: MediaQuery.of(context).size.height * 0.08,
+              child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                Container(
+                  height: 80,
+                  padding: EdgeInsets.all(12),
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  decoration: const BoxDecoration(
+                    color: Colors.amber,
+                    borderRadius:
+                        BorderRadius.only(topLeft: Radius.circular(80)),
+                  ),
+                  child: Text(
+                    "\$" + widget.data["price"].toString(),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
                 ),
-                child: Text(
-                  "\$" + widget.data["price"].toString(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ]),
+              ]),
+            ),
           ),
         ],
       ),
